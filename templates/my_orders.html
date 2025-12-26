@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/payments.css' %}">
+
+<div class="page">
+
+  <h2>My Orders</h2>
+
+  {% if orders %}
+    {% for order in orders %}
+      <div class="order-card">
+
+        <!-- Order header -->
+        <div class="info">
+          <span class="order-title">Order #{{ order.id }}</span>
+          <span class="order-amount">₹{{ order.total_amount }}</span>
+        </div>
+
+        <p class="order-subtitle">Order Summary</p>
+
+        <!-- Status -->
+        {% with payment=order.orderpayment %}
+          {% if payment.payment_status == "CREATED" %}
+            <p class="status awaiting">💰 Awaiting Payment</p>
+          {% elif payment.payment_status == "PENDING_VERIFICATION" %}
+            <p class="status pending">⏳ Payment Under Verification</p>
+          {% elif payment.payment_status == "PAID" %}
+            <p class="status success">✅ Payment Successful</p>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Action -->
+        <a href="{% url 'order_success' order.id %}">
+          <button class="btn btn-outline">View Order</button>
+        </a>
+
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="status">No orders found.</p>
+  {% endif %}
+
+  <a href="{% url 'menu' %}" class="link">← Back to Menu</a>
+
+</div>
+{% endblock %}

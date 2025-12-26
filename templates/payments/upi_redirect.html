@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+  {% block content %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/payments.css' %}">
+
+<div class="page">
+  <div class="card">
+
+    <h2>Pay using UPI</h2>
+    <p class="subtext">Complete payment in your UPI app</p>
+
+    <div class="info">
+      <span>Order ID</span>
+      <span>#{{ order.id }}</span>
+    </div>
+
+    <div class="info">
+      <span>Amount</span>
+      <span>₹{{ order.total_amount }}</span>
+    </div>
+
+    <a href="{{ upi_url }}">
+      <button class="btn btn-primary">
+        Open UPI App
+      </button>
+    </a>
+
+    <form method="post" action="{% url 'upi_confirm' order.id %}">
+      {% csrf_token %}
+      <button id="paid-btn" class="btn btn-outline" disabled>
+        I have paid
+      </button>
+    </form>
+
+  </div>
+</div>
+
+<script>
+  document.querySelector("a[href^='upi://']").onclick = function () {
+    document.getElementById("paid-btn").disabled = false;
+  };
+</script>
+  {% endblock %}

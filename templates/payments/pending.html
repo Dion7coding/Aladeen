@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+    {% block content %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/payments.css' %}">
+
+<div class="page">
+  <div class="card">
+
+    <h2>Payment Submitted</h2>
+    <p class="status pending">
+      We are verifying your payment.
+    </p>
+
+    <a href="{% url 'menu' %}">
+      <button class="btn btn-primary">
+        Back to Menu
+      </button>
+    </a>
+
+    <a href="{% url 'my_orders' %}" class="link">
+      View My Orders
+    </a>
+
+  </div>
+</div>
+    {% endblock %}

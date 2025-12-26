@@ -1,10 +1,72 @@
 {% extends 'base.html' %}
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 {% block content %}
-<div class="card" style="text-align: center;">
-    <h2 style="color: #28a745;">Order Placed!</h2>
-    <p>Your order has been received.</p>
-    <p>Sit tight! Snacks are on the way.</p>
-    <a href="{% url 'menu' %}" class="btn btn-primary">Back to Menu</a>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/payments.css' %}">
+
+<div class="page">
+  <div class="card">
+
+    <h2>Order Placed</h2>
+
+    <div class="info">
+      <span>Order ID</span>
+      <span>#{{ order.id }}</span>
+    </div>
+
+    <div class="info">
+      <span>Total</span>
+      <span>₹{{ order.total_amount }}</span>
+    </div>
+<hr>
+
+<h3>Order Items</h3>
+
+{% if order.items.all %}
+  {% for item in order.items.all %}
+    <div class="info">
+      <span>
+        {{ item.snack.name }} × {{ item.quantity }}
+      </span>
+      <span>
+        ₹{{ item.price|floatformat:2 }}
+      </span>
+    </div>
+  {% endfor %}
+{% else %}
+  <p class="status">No items found.</p>
+{% endif %}
+
+<hr>
+
+    {% with payment=order.orderpayment %}
+      {% if payment.payment_status == "CREATED" %}
+        <a href="{% url 'upi_pay' order.id %}">
+          <button class="btn btn-primary">
+            Pay via UPI
+          </button>
+        </a>
+
+      {% elif payment.payment_status == "PENDING_VERIFICATION" %}
+        <p class="status pending">
+          Payment submitted. Waiting for verification.
+        </p>
+
+      {% elif payment.payment_status == "PAID" %}
+        <p class="status success">
+          Payment successful!
+        </p>
+      {% endif %}
+    {% endwith %}
+
+    <a href="{% url 'menu' %}" class="link">
+      Back to Menu
+    </a>
+
+    <a href="{% url 'my_orders' %}" class="link">
+      My Orders
+    </a>
+
+  </div>
 </div>
 {% endblock %}

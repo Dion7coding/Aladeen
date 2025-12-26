@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/payments.css' %}">
+
+<a href="{% url 'upi_pay' order.id %}" id="pay-btn" class="btn btn-primary">
+  Pay via UPI
+</a>
+
+<form method="post" action="{% url 'upi_confirm' order.id %}">
+  {% csrf_token %}
+  <button id="paid-btn" disabled class="btn btn-success">
+    I have paid
+  </button>
+</form>
+
+<script>
+  document.getElementById("pay-btn").onclick = function () {
+    document.getElementById("paid-btn").disabled = false;
+  };
+</script>
+<script>
+  const paidBtn = document.getElementById("paid-btn");
+  const upiBtn = document.querySelector("a[href^='upi://']");
+
+  paidBtn.addEventListener("click", function () {
+    upiBtn.style.pointerEvents = "none";
+    upiBtn.style.opacity = "0.5";
+  });
+</script>
+
+{% endblock %}

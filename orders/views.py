@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+
+from payments.models import OrderPayment
 from .models import Snack, Order, OrderItem
 from django.contrib import messages
 from django.db import transaction
@@ -93,7 +95,7 @@ def checkout(request):
     user_info = request.session.get('user_info')
     if not user_info:
         return redirect('landing_page')
-    
+
     cart = request.session.get('cart', {})
     if not cart:
         return redirect('menu')
@@ -103,40 +105,31 @@ def checkout(request):
     for snack_id, quantity in cart.items():
         snack = get_object_or_404(Snack, id=snack_id)
         total += snack.price * quantity
-        cart_items.append({'snack': snack, 'quantity': quantity, 'subtotal': snack.price * quantity})
+        cart_items.append({
+            'snack': snack,
+            'quantity': quantity,
+            'subtotal': snack.price * quantity
+        })
 
     if request.method == 'POST':
-        # Proceed to payment (mock)
-        request.session['order_total'] = float(total)
-        return redirect('payment')
-
-    return render(request, 'checkout.html', {'cart_items': cart_items, 'total': total, 'user_info': user_info})
-
-def payment(request):
-    total = request.session.get('order_total', 0)
-    if request.method == 'POST':
-        # Create Order
-        user_info = request.session.get('user_info')
-        cart = request.session.get('cart', {})
-        
         try:
             with transaction.atomic():
+                # 1️⃣ Create Order
                 order = Order.objects.create(
                     lab_name=user_info['lab_name'],
                     system_number=user_info['system_number'],
                     total_amount=total,
-                    status='Pending',
-                    payment_status=True # Mock success
+                    status='Pending'
                 )
-                
-                for snack_id, quantity in cart.items():
-                    # Re-fetch snack with lock to prevent race conditions ideally, 
-                    # but simple get is fine for this scope.
-                    snack = Snack.objects.select_for_update().get(id=snack_id)
-                    
+
+                # 2️⃣ Create Order Items + update stock
+                for item in cart_items:
+                    snack = item['snack']
+                    quantity = item['quantity']
+
                     if snack.stock < quantity:
                         raise Exception(f"Insufficient stock for {snack.name}")
-                    
+
                     snack.stock -= quantity
                     snack.save()
 
@@ -146,19 +139,30 @@ def payment(request):
                         quantity=quantity,
                         price=snack.price
                     )
-                
-                # Clear cart only if successful
+
+                # 3️⃣ Create Payment record
+                from payments.models import OrderPayment
+                OrderPayment.objects.create(order=order)
+
+                # 4️⃣ Clear cart
                 del request.session['cart']
-                if 'order_total' in request.session:
-                    del request.session['order_total']
-                    
-                return redirect('order_success')
+
+            # 5️⃣ Redirect to success page
+            return redirect('order_success', order_id=order.id)
+
         except Exception as e:
             messages.error(request, str(e))
             return redirect('cart')
-        
-    return render(request, 'payment.html', {'total': total})
 
+    return render(request, 'checkout.html', {
+        'cart_items': cart_items,
+        'total': total,
+        'user_info': user_info
+    })
 
-def order_success(request):
-    return render(request, 'order_success.html')
+def order_success(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, "order_success.html", {
+        "order": order
+    })
+
