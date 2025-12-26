@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">Checkout</h2>
+
+    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: #555;">Order Summary</h3>
+        {% for item in cart_items %}
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <span>{{ item.snack.name }} <small>x{{ item.quantity }}</small></span>
+            <span>₹{{ item.subtotal }}</span>
+        </div>
+        {% endfor %}
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0;">
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem;">
+            <span>Total</span>
+            <span style="color: var(--primary-color);">₹{{ total }}</span>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: #555;">Delivery Location</h3>
+        <p style="margin: 5px 0;">
+            <i class="fas fa-flask" style="width: 20px; color: #999;"></i>
+            <strong>{{ user_info.lab_name }}</strong>
+        </p>
+        <p style="margin: 5px 0;">
+            <i class="fas fa-desktop" style="width: 20px; color: #999;"></i>
+            <strong>{{ user_info.system_number }}</strong>
+        </p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary btn-block">
+            Confirm & Pay ₹{{ total }}
+        </button>
+    </form>
+</div>
+{% endblock %}

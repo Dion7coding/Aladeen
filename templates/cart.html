@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Your Cart</h2>
+
+{% if cart_items %}
+<div
+    style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; color: #333;">
+    {% for item in cart_items %}
+    <div
+        style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h4 style="margin: 0 0 5px;">{{ item.snack.name }}</h4>
+            <p style="margin: 0; color: #666;">₹{{ item.snack.price }} x {{ item.quantity }}</p>
+        </div>
+        <div style="text-align: right;">
+            <span style="display: block; font-weight: bold; margin-bottom: 5px;">₹{{ item.subtotal }}</span>
+            <a href="{% url 'remove_from_cart' item.snack.id %}"
+                style="color: #dc3545; text-decoration: none; font-size: 0.9rem;">
+                <i class="fas fa-trash"></i> Remove
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+    <div style="padding: 20px; background: #fff8e1; text-align: right;">
+        <h3 style="margin: 0;">Total: ₹{{ total }}</h3>
+    </div>
+</div>
+
+<div style="margin-top: 20px;">
+    <a href="{% url 'checkout' %}" class="btn btn-primary btn-block">Proceed to Checkout</a>
+    <br>
+    <a href="{% url 'menu' %}" class="btn btn-block" style="background: white; color: #333; border: 1px solid #ddd;">
+        Back to Menu
+    </a>
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 40px;">
+    <i class="fas fa-shopping-basket fa-3x" style="color: #ddd; margin-bottom: 20px;"></i>
+    <p>Your cart is empty.</p>
+    <a href="{% url 'menu' %}" class="btn btn-primary">Start Ordering</a>
+</div>
+{% endif %}
+{% endblock %}

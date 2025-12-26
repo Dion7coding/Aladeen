@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aladeen - Login</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: #111;
+            /* Fallback */
+        }
+
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            /* Let clicks pass through to canvas if needed, but form needs pointer-events */
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            /* Slightly rounded, checking ref image */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+            pointer-events: auto;
+            /* Re-enable clicks */
+        }
+
+        .login-header {
+            margin-bottom: 30px;
+        }
+
+        /* Check reference image for logo? User said "do not copy the logo". 
+           So maybe just text or the Aladeen icon? 
+           "I want the login page to be like the one in the image... do not copy the logo"
+           I'll put the Aladeen name/icon cleanly. */
+        .login-header h1 {
+            color: #ff6f00;
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: #333;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #ff6f00;
+            outline: none;
+        }
+
+        .btn-login {
+            background-color: #007bff;
+            /* Blue like the reference image? Reference had blue button */
+            /* User said "like the one in the image". Image has blue button. */
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-box {
+                width: 85%;
+            }
+        }
+    </style>
+    <!-- Animation CSS from dist/style.css might conflict or be needed. 
+    The dist/index.html had <link rel="stylesheet" href="./style.css">.
+    Let's inline relevant parts or link it. 
+    Ideally we just want the canvas to fill screen. My CSS above handles that.
+    -->
+</head>
+
+<body>
+
+    <div id="app">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <!-- User said no logo, but Aladeen needs branding? 
+                     "do not copy the logo... of the reference image"
+                     I will use Aladeen text branding. -->
+                <h1><i class="fas fa-utensils"></i> Aladeen</h1>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="text" name="lab_name" class="form-control" placeholder="Lab Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="system_number" class="form-control" placeholder="System Number" required>
+                </div>
+                <button type="submit" class="btn-login">Log in</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Animation Script -->
+    <script type="module" src="{% static 'animation/script.js' %}"></script>
+</body>
+
+</html>

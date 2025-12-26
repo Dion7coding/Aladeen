@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card" style="text-align: center;">
+    <h2 style="color: #28a745;">Order Placed!</h2>
+    <p>Your order has been received.</p>
+    <p>Sit tight! Snacks are on the way.</p>
+    <a href="{% url 'menu' %}" class="btn btn-primary">Back to Menu</a>
+</div>
+{% endblock %}
