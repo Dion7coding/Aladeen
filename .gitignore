@@ -11,3 +11,6 @@ env/
 
 # OS files
 .DS_Store
+ 
+
+firebase_service_account.json
