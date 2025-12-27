@@ -13,3 +13,40 @@ class AdminOrderSerializer(serializers.ModelSerializer):
             "status",
             "created_at",
         ]
+from orders.models import OrderItem
+from payments.models import OrderPayment
+
+
+class AdminOrderItemSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="snack.name")
+
+    class Meta:
+        model = OrderItem
+        fields = [
+            "name",
+            "quantity",
+            "price",
+        ]
+
+
+class AdminOrderDetailSerializer(serializers.ModelSerializer):
+    items = AdminOrderItemSerializer(many=True, read_only=True)
+    payment_status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = [
+            "id",
+            "lab_name",
+            "system_number",
+            "total_amount",
+            "status",
+            "payment_status",
+            "items",
+        ]
+
+    def get_payment_status(self, obj):
+        try:
+            return obj.orderpayment.payment_status
+        except OrderPayment.DoesNotExist:
+            return "NOT_CREATED"

@@ -42,3 +42,14 @@ class AdminOrdersListAPI(APIView):
         orders = Order.objects.all().order_by("-created_at")
         serializer = AdminOrderSerializer(orders, many=True)
         return Response(serializer.data)
+from django.shortcuts import get_object_or_404
+from .serializers import AdminOrderDetailSerializer
+
+
+class AdminOrderDetailAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUserOnly]
+
+    def get(self, request, id):
+        order = get_object_or_404(Order, id=id)
+        serializer = AdminOrderDetailSerializer(order)
+        return Response(serializer.data)
