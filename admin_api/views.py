@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from orders.models import Order
-from .serializers import AdminMenuSerializer, AdminOrderSerializer
+from .serializers import AdminMenuSerializer, AdminOrderSerializer, AdminUPISerializer
 from .permissions import IsAdminUserOnly
 
 
@@ -54,7 +54,7 @@ class AdminOrderDetailAPI(APIView):
         serializer = AdminOrderDetailSerializer(order)
         return Response(serializer.data)
 from django.utils import timezone
-from payments.models import OrderPayment
+from payments.models import OrderPayment, UPIAccount
 
 
 class AdminApprovePaymentAPI(APIView):
@@ -103,3 +103,27 @@ class AdminMenuUpdateAPI(APIView):
         serializer.save()
 
         return Response(serializer.data)
+class AdminUPIListCreateAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUserOnly]
+
+    def get(self, request):
+        upis = UPIAccount.objects.all().order_by("-created_at")
+        serializer = AdminUPISerializer(upis, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = AdminUPISerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(is_active=False)
+        return Response(serializer.data, status=201)
+
+
+class AdminUPIActivateAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUserOnly]
+
+    def patch(self, request, id):
+        UPIAccount.objects.update(is_active=False)
+        upi = get_object_or_404(UPIAccount, id=id)
+        upi.is_active = True
+        upi.save()
+        return Response({"active_upi": upi.upi_id})

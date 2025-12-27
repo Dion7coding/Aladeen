@@ -63,3 +63,15 @@ class AdminMenuSerializer(serializers.ModelSerializer):
             "stock",
             "is_available",
         ]
+from payments.models import UPIAccount
+
+
+class AdminUPISerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UPIAccount
+        fields = [
+            "id",
+            "upi_id",
+            "qr_code",
+            "is_active",
+        ]
