@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from orders.models import Order
-from .serializers import AdminOrderSerializer
+from .serializers import AdminMenuSerializer, AdminOrderSerializer
 from .permissions import IsAdminUserOnly
 
 
@@ -78,3 +78,28 @@ class AdminApprovePaymentAPI(APIView):
         payment.order.save()
 
         return Response({"status": "PAID"})
+from orders.models import Snack
+
+
+class AdminMenuListAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUserOnly]
+
+    def get(self, request):
+        snacks = Snack.objects.all().order_by("name")
+        serializer = AdminMenuSerializer(snacks, many=True)
+        return Response(serializer.data)
+
+
+class AdminMenuUpdateAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUserOnly]
+
+    def patch(self, request, id):
+        snack = get_object_or_404(Snack, id=id)
+
+        serializer = AdminMenuSerializer(
+            snack, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)

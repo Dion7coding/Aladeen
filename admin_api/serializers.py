@@ -50,3 +50,16 @@ class AdminOrderDetailSerializer(serializers.ModelSerializer):
             return obj.orderpayment.payment_status
         except OrderPayment.DoesNotExist:
             return "NOT_CREATED"
+from orders.models import Snack
+
+
+class AdminMenuSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Snack
+        fields = [
+            "id",
+            "name",
+            "price",
+            "stock",
+            "is_available",
+        ]
