@@ -1,5 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
+from admin_api.notifications import notify_admin_payment
 from orders.models import Order
 from .models import UPIAccount, OrderPayment
 def upi_redirect(request, order_id):
@@ -46,7 +47,7 @@ def confirm_payment(request, order_id):
     payment.payment_status = "PENDING_VERIFICATION"
     payment.submitted_at = timezone.now()
     payment.save()
-
+    notify_admin_payment(order)
     return render(request, "payments/pending.html", {
         "order": order
     })

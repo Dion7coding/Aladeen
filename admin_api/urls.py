@@ -1,4 +1,6 @@
 from django.urls import path
+
+from admin_api.models import AdminRegisterDeviceAPI, AdminUnregisterDeviceAPI
 from .views import AdminApprovePaymentAPI, AdminMenuListAPI, AdminMenuUpdateAPI, AdminOrderDetailAPI, AdminOrdersListAPI, AdminUPIActivateAPI, AdminUPIListCreateAPI, admin_login
 
 urlpatterns = [
@@ -11,4 +13,7 @@ urlpatterns = [
     path("menu/<int:id>/", AdminMenuUpdateAPI.as_view()),
      path("upi/", AdminUPIListCreateAPI.as_view()),
     path("upi/<int:id>/activate/", AdminUPIActivateAPI.as_view()),
+    path("register-device/", AdminRegisterDeviceAPI.as_view()),
+path("unregister-device/", AdminUnregisterDeviceAPI.as_view()),
+
 ]
