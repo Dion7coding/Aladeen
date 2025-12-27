@@ -53,3 +53,28 @@ class AdminOrderDetailAPI(APIView):
         order = get_object_or_404(Order, id=id)
         serializer = AdminOrderDetailSerializer(order)
         return Response(serializer.data)
+from django.utils import timezone
+from payments.models import OrderPayment
+
+
+class AdminApprovePaymentAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUserOnly]
+
+    def post(self, request, id):
+        payment = get_object_or_404(OrderPayment, order_id=id)
+
+        if payment.payment_status == "PAID":
+            return Response(
+                {"message": "Payment already approved"},
+                status=400
+            )
+
+        payment.payment_status = "PAID"
+        payment.verified_at = timezone.now()
+        payment.save()
+
+        # Optional: mark order completed
+        payment.order.status = "Completed"
+        payment.order.save()
+
+        return Response({"status": "PAID"})
