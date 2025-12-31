@@ -1,18 +1,27 @@
 from django.contrib.auth import authenticate
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from orders.models import Order
-from .serializers import AdminMenuSerializer, AdminOrderSerializer, AdminUPISerializer
+from orders.models import Order, Snack
+from payments.models import OrderPayment, UPIAccount
+from .serializers import (
+    AdminMenuSerializer, 
+    AdminOrderSerializer, 
+    AdminUPISerializer, 
+    AdminOrderDetailSerializer
+)
 from .permissions import IsAdminUserOnly
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def admin_login(request):
     username = request.data.get("username")
     password = request.data.get("password")
@@ -42,8 +51,6 @@ class AdminOrdersListAPI(APIView):
         orders = Order.objects.all().order_by("-created_at")
         serializer = AdminOrderSerializer(orders, many=True)
         return Response(serializer.data)
-from django.shortcuts import get_object_or_404
-from .serializers import AdminOrderDetailSerializer
 
 
 class AdminOrderDetailAPI(APIView):
@@ -53,8 +60,6 @@ class AdminOrderDetailAPI(APIView):
         order = get_object_or_404(Order, id=id)
         serializer = AdminOrderDetailSerializer(order)
         return Response(serializer.data)
-from django.utils import timezone
-from payments.models import OrderPayment, UPIAccount
 
 
 class AdminApprovePaymentAPI(APIView):
@@ -78,7 +83,6 @@ class AdminApprovePaymentAPI(APIView):
         payment.order.save()
 
         return Response({"status": "PAID"})
-from orders.models import Snack
 
 
 class AdminMenuListAPI(APIView):
@@ -103,6 +107,8 @@ class AdminMenuUpdateAPI(APIView):
         serializer.save()
 
         return Response(serializer.data)
+
+
 class AdminUPIListCreateAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUserOnly]
 
